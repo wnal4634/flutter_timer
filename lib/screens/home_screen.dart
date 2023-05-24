@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,23 +12,31 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const twentyFiveMinutes = 1500;
-  int totalSeconds = twentyFiveMinutes;
+  int totalSeconds = 0;
   bool isRunning = false;
   int totalPomodoros = 0;
   late Timer timer; // late는 나중에 초기화
+  // final DateTime _selectedDate = DateTime.now();
+  // final String _endTime = '9:30 PM';
+  // String _startTime = DateFormat('hh:mm a').format(DateTime.now()).toString();
+  String choice_num = '00:05:00';
 
   void onTick(Timer timer) {
+    setState(() {
+      totalSeconds = stringToInt(choice_num);
+      print(totalSeconds);
+    });
     if (totalSeconds == 0) {
       setState(() {
         totalPomodoros += 1;
         isRunning = false;
-        totalSeconds = twentyFiveMinutes;
+        totalSeconds = 0;
       });
       timer.cancel();
     } else {
       setState(() {
-        totalSeconds -= 1; // 남은 시간 1초씩 줄이기
+        totalSeconds = totalSeconds - 1; // 남은 시간 1초씩 줄이기
+        print(totalSeconds);
       });
     }
   }
@@ -51,14 +62,26 @@ class _HomeScreenState extends State<HomeScreen> {
     timer.cancel();
     setState(() {
       isRunning = false;
-      totalSeconds = twentyFiveMinutes;
+      totalSeconds = 300;
     });
     // onStartPressed();  // 이거 넣으면 restart까지 됨
   }
 
   String format(int seconds) {
     var duration = Duration(seconds: seconds);
-    return duration.toString().split(".").first.substring(2, 7);
+    print(duration);
+    return duration.toString().split(".").first;
+  }
+
+  // String format(String time) {
+  //   return time;
+  // }
+
+  int stringToInt(String time333) {
+    int total = 0;
+    total = (int.parse(time333.split(':').first) * 3600) +
+        (int.parse(time333.split(':')[1]) * 60);
+    return total;
   }
 
   @override
@@ -68,16 +91,48 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           Flexible(
-            flex: 1,
+            flex: 2,
             child: Container(
               alignment: Alignment.bottomCenter,
-              child: Text(
-                format(totalSeconds),
-                style: TextStyle(
-                  color: Theme.of(context).cardColor,
-                  fontSize: 89,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    child: Text(
+                      format(stringToInt(choice_num)),
+                      style: TextStyle(
+                        color: Theme.of(context).cardColor,
+                        fontSize: 89,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onPressed: () {},
+                  ),
+                  TimePickerSpinnerPopUp(
+                    mode: CupertinoDatePickerMode.time,
+                    initTime: DateTime.parse('0000-00-00T00+23:55'),
+                    barrierColor:
+                        Colors.black12, //Barrier Color when pop up show
+                    minuteInterval: 1,
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                    cancelText: 'Cancel',
+                    confirmText: 'OK',
+                    pressType: PressType.singlePress,
+                    timeFormat: 'HH:mm:ss',
+                    // textStyle: const TextStyle(
+                    //   color: Colors.white,
+                    // ),
+                    // Customize your time widget
+                    // timeWidgetBuilder: (dateTime) {},
+                    onChange: (dateTime) {
+                      // Implement your logic with select dateTime
+                      setState(() {
+                        choice_num =
+                            dateTime.toString().split(' ').last.substring(0, 8);
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -125,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Pomodors',
+                          'Pomodoros',
                           style: TextStyle(
                             fontSize: 20,
                             color:
@@ -153,4 +208,34 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  // _getTimeFromUser({required bool isStartTime}) async {
+  //   var pickedTime = await _showTimePicker();
+  //   if (pickedTime == null) {
+  //     print('Time canceled');
+  //   } else if (isStartTime == true) {
+  //     setState(() {
+  //       _startTime = pickedTime.format(context);
+  //     });
+  //   } else {
+  //     setState(() {
+  //       // _endTime = formatedTime;
+  //     });
+  //   }
+  // }
+
+  // _showTimePicker() {
+  //   return showTimePicker(
+  //     initialEntryMode: TimePickerEntryMode.input,
+  //     context: context,
+  //     initialTime: TimeOfDay(
+  //       hour: int.parse(
+  //         _startTime.split(':')[0],
+  //       ),
+  //       minute: int.parse(
+  //         _startTime.split(':')[1].split(' ')[0],
+  //       ),
+  //     ),
+  //   );
+  // }
 }
