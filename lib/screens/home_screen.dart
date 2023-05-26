@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pomo_app/services/theme_services.dart';
 import 'dart:async';
 import 'package:pomo_app/screens/theme.dart';
+import 'package:pomo_app/widgets/input_field.dart';
 
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
@@ -21,6 +22,19 @@ class _HomeScreenState extends State<HomeScreen> {
   int totalPomodoros = 0;
   late Timer timer; // late는 나중에 초기화
   String choice_num = '00:00:00';
+  int _selectedRemind = 5;
+  List<int> remindList = [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+  ];
 
   void onTick(Timer timer) {
     if (totalSeconds == 0) {
@@ -123,6 +137,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       changeSeconds = stringToInt(choice_num);
                     });
                   },
+                ),
+                MyInputField(
+                  title: 'Repetition',
+                  hint: '$_selectedRemind번 반복',
+                  widget: DropdownButton(
+                    icon: Transform.translate(
+                      offset: const Offset(-5, 0),
+                      child: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    iconSize: 32,
+                    elevation: 4,
+                    style: subTitleStyle,
+                    underline: Container(
+                      height: 0,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedRemind = int.parse(newValue!);
+                      });
+                    },
+                    items: remindList.map<DropdownMenuItem<String>>(
+                      (int value) {
+                        return DropdownMenuItem<String>(
+                          value: value.toString(),
+                          child: Text(
+                            value.toString(),
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  ),
                 ),
               ],
             ),
