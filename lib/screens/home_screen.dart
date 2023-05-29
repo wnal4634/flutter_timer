@@ -21,7 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isRunning = false;
   int totalPomodoros = 0;
   late Timer timer; // late는 나중에 초기화
-  String choice_num = '00:00:00';
+  String choiceNum = '00:00:00';
+  String choiceNum_2 = '00:00:00';
   int _selectedRemind = 5;
   List<int> remindList = [
     1,
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onStartPressed() {
-    totalSeconds = stringToInt(choice_num);
+    totalSeconds = stringToInt(choiceNum);
     totalSeconds = changeSeconds;
     timer = Timer.periodic(
       const Duration(seconds: 1), // 1초에 한 번씩 onTick 실행
@@ -81,9 +82,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return duration.toString().split(".").first.padLeft(8, '0');
   }
 
-  int stringToInt(String time333) {
-    int total = (int.parse(time333.split(':').first) * 3600) +
-        (int.parse(time333.split(':')[1]) * 60);
+  int stringToInt(String time) {
+    int total = (int.parse(time.split(':').first) * 3600) +
+        (int.parse(time.split(':')[1]) * 60);
     return total;
   }
 
@@ -99,18 +100,22 @@ class _HomeScreenState extends State<HomeScreen> {
   _showBody() {
     return Column(
       children: [
-        Flexible(
-          flex: 2,
-          child: Container(
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   format(changeSeconds),
                   style: TextStyle(
                     color: Get.isDarkMode ? Colors.white : darkHeaderClr,
-                    fontSize: 89,
+                    fontSize: 70,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -132,118 +137,154 @@ class _HomeScreenState extends State<HomeScreen> {
                   onChange: (dateTime) {
                     // Implement your logic with select dateTime
                     setState(() {
-                      choice_num =
+                      choiceNum =
                           dateTime.toString().split(' ').last.substring(0, 8);
-                      changeSeconds = stringToInt(choice_num);
+                      changeSeconds = stringToInt(choiceNum);
                     });
                   },
                 ),
-                MyInputField(
-                  title: 'Repetition',
-                  hint: '$_selectedRemind번 반복',
-                  widget: DropdownButton(
-                    icon: Transform.translate(
-                      offset: const Offset(-5, 0),
-                      child: const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    iconSize: 32,
-                    elevation: 4,
-                    style: subTitleStyle,
-                    underline: Container(
-                      height: 0,
-                    ),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedRemind = int.parse(newValue!);
-                      });
-                    },
-                    items: remindList.map<DropdownMenuItem<String>>(
-                      (int value) {
-                        return DropdownMenuItem<String>(
-                          value: value.toString(),
-                          child: Text(
-                            value.toString(),
-                          ),
-                        );
-                      },
-                    ).toList(),
-                  ),
-                ),
               ],
             ),
           ),
         ),
-        Flexible(
-          flex: 3,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  iconSize: 120,
-                  color: Get.isDarkMode ? Colors.white : darkHeaderClr,
-                  onPressed: isRunning ? onPausePressed : onStartPressed,
-                  icon: Icon(
-                    isRunning
-                        ? Icons.pause_circle_outline
-                        : Icons.play_circle_outline,
-                  ),
-                ),
-                // IconButton(
-                //   iconSize: 120,
-                //   color: Theme.of(context).cardColor,
-                //   onPressed: onResetPressed,
-                //   icon: const Icon(
-                //     Icons.refresh_outlined,
-                //   ),
-                // )
-              ],
-            ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
           ),
-        ),
-        Flexible(
-          flex: 1,
           child: Row(
+            // mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(40),
-                    ),
-                    color: Get.isDarkMode ? Colors.grey[600] : Colors.grey[300],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Pomodoros',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color:
-                              Theme.of(context).textTheme.displayLarge!.color,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '$totalPomodoros',
-                        style: TextStyle(
-                          fontSize: 58,
-                          color:
-                              Theme.of(context).textTheme.displayLarge!.color,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+              Text(
+                format(changeSeconds),
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 50,
+                  fontWeight: FontWeight.w600,
                 ),
+              ),
+              TimePickerSpinnerPopUp(
+                mode: CupertinoDatePickerMode.time,
+                initTime: DateTime.parse('0000-00-00T00+00:00'),
+                barrierColor: Colors.black12, //Barrier Color when pop up show
+                minuteInterval: 1,
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                cancelText: 'Cancel',
+                confirmText: 'OK',
+                pressType: PressType.singlePress,
+                timeFormat: 'HH:mm:ss',
+                // textStyle: const TextStyle(
+                //   color: Colors.white,
+                // ),
+                // Customize your time widget
+                // timeWidgetBuilder: (dateTime) {},
+                onChange: (dateTime) {
+                  // Implement your logic with select dateTime
+                  setState(() {
+                    choiceNum_2 =
+                        dateTime.toString().split(' ').last.substring(0, 8);
+                    changeSeconds = stringToInt(choiceNum_2);
+                  });
+                },
               ),
             ],
           ),
-        )
+        ),
+        MyInputField(
+          hint: '$_selectedRemind번 실행',
+          widget: DropdownButton(
+            icon: Transform.translate(
+              offset: const Offset(-5, 0),
+              child: const Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.grey,
+              ),
+            ),
+            iconSize: 32,
+            elevation: 4,
+            style: subTitleStyle,
+            underline: Container(
+              height: 0,
+            ),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedRemind = int.parse(newValue!);
+              });
+            },
+            items: remindList.map<DropdownMenuItem<String>>(
+              (int value) {
+                return DropdownMenuItem<String>(
+                  value: value.toString(),
+                  child: Text(
+                    value.toString(),
+                  ),
+                );
+              },
+            ).toList(),
+          ),
+        ),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                iconSize: 120,
+                color: Get.isDarkMode ? Colors.white : darkHeaderClr,
+                onPressed: isRunning ? onPausePressed : onStartPressed,
+                icon: Icon(
+                  isRunning
+                      ? Icons.pause_circle_outline
+                      : Icons.play_circle_outline,
+                ),
+              ),
+              // IconButton(
+              //   iconSize: 120,
+              //   color: Theme.of(context).cardColor,
+              //   onPressed: onResetPressed,
+              //   icon: const Icon(
+              //     Icons.refresh_outlined,
+              //   ),
+              // )
+            ],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(40),
+                  ),
+                  color: Get.isDarkMode ? Colors.grey[600] : Colors.grey[300],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Pomodoros',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Theme.of(context).textTheme.displayLarge!.color,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '$totalPomodoros',
+                      style: TextStyle(
+                        fontSize: 58,
+                        color: Theme.of(context).textTheme.displayLarge!.color,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
