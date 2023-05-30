@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:numberpicker/numberpicker.dart';
 import 'package:pomo_app/services/theme_services.dart';
 import 'dart:async';
 import 'package:pomo_app/screens/theme.dart';
-import 'package:pomo_app/widgets/input_field.dart';
-
-import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,12 +15,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int totalSeconds = 0;
   int changeSeconds = 0;
+  int restChangeSeconds = 0;
+  int minChange = 0;
+  int secChange = 0;
+  int restMinChange = 0;
+  int restSecChange = 0;
   bool isRunning = false;
-  int totalPomodoros = 0;
   late Timer timer; // late는 나중에 초기화
-  String choiceNum = '00:00:00';
-  String choiceNum_2 = '00:00:00';
-  int _selectedRemind = 5;
+  String choiceNum = '00:00';
+  String choiceNum_2 = '00:00';
+  int _selectedRemind = 1;
   List<int> remindList = [
     1,
     2,
@@ -36,11 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
     9,
     10,
   ];
+  int _currentValue = 0;
+  int _currentValue_2 = 0;
 
   void onTick(Timer timer) {
     if (totalSeconds == 0) {
       setState(() {
-        totalPomodoros += 1;
         isRunning = false;
         totalSeconds = 0;
       });
@@ -54,12 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  int saveSeconds(int s) {
-    return 2;
-  }
-
   void onStartPressed() {
-    totalSeconds = stringToInt(choiceNum);
+    // totalSeconds = stringToInt(choiceNum);
     totalSeconds = changeSeconds;
     timer = Timer.periodic(
       const Duration(seconds: 1), // 1초에 한 번씩 onTick 실행
@@ -77,16 +75,33 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // String format(int seconds) {
+  //   // var duration = Duration(seconds: seconds);
+  //   // return duration.toString().split(".").first.padLeft(8, '0');
+  //
+  //   var duration = Duration(seconds: seconds);
+  //   var short = duration.toString().split(".").first.split(':');
+  //   if (short[0] != 0) {
+  //     int hour = int.parse(short[0]) * 60;
+  //     int min = int.parse(short[1]);
+  //     short[1] = (hour + min).toString();
+  //     if (short[1].length == 1) {
+  //       short[1] = short[1].padLeft(2, '0');
+  //     }
+  //   }
+  //   return '${short[1]}:${short.last}';
+  // }
+
   String format(int seconds) {
     var duration = Duration(seconds: seconds);
-    return duration.toString().split(".").first.padLeft(8, '0');
+    return duration.toString().split(".").first.substring(2, 7);
   }
 
-  int stringToInt(String time) {
-    int total = (int.parse(time.split(':').first) * 3600) +
-        (int.parse(time.split(':')[1]) * 60);
-    return total;
-  }
+  // int stringToInt(String time) {
+  //   int total = (int.parse(time.split(':').first) * 3600) +
+  //       (int.parse(time.split(':')[1]) * 60);
+  //   return total;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -119,30 +134,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                TimePickerSpinnerPopUp(
-                  mode: CupertinoDatePickerMode.time,
-                  initTime: DateTime.parse('0000-00-00T00+00:00'),
-                  barrierColor: Colors.black12, //Barrier Color when pop up show
-                  minuteInterval: 1,
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                  cancelText: 'Cancel',
-                  confirmText: 'OK',
-                  pressType: PressType.singlePress,
-                  timeFormat: 'HH:mm:ss',
-                  // textStyle: const TextStyle(
-                  //   color: Colors.white,
-                  // ),
-                  // Customize your time widget
-                  // timeWidgetBuilder: (dateTime) {},
-                  onChange: (dateTime) {
-                    // Implement your logic with select dateTime
-                    setState(() {
-                      choiceNum =
-                          dateTime.toString().split(' ').last.substring(0, 8);
-                      changeSeconds = stringToInt(choiceNum);
-                    });
-                  },
-                ),
+                // TimePickerSpinnerPopUp(
+                //   mode: CupertinoDatePickerMode.time,
+                //   initTime: DateTime.parse('0000-00-00T00+00:00'),
+                //   barrierColor: Colors.black12, //Barrier Color when pop up show
+                //   minuteInterval: 1,
+                //   padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                //   cancelText: 'Cancel',
+                //   confirmText: 'OK',
+                //   pressType: PressType.singlePress,
+                //   timeFormat: 'HH:mm:ss',
+                //   // textStyle: const TextStyle(
+                //   //   color: Colors.white,
+                //   // ),
+                //   // Customize your time widget
+                //   // timeWidgetBuilder: (dateTime) {},
+                //   onChange: (dateTime) {
+                //     // Implement your logic with select dateTime
+                //     setState(() {
+                //       choiceNum =
+                //           dateTime.toString().split(' ').last.substring(0, 8);
+                //       // changeSeconds = stringToInt(choiceNum);
+                //     });
+                //   },
+                // ),
               ],
             ),
           ),
@@ -158,72 +173,25 @@ class _HomeScreenState extends State<HomeScreen> {
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                format(changeSeconds),
+                format(restChangeSeconds),
                 style: TextStyle(
                   color: Colors.grey[500],
                   fontSize: 50,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              TimePickerSpinnerPopUp(
-                mode: CupertinoDatePickerMode.time,
-                initTime: DateTime.parse('0000-00-00T00+00:00'),
-                barrierColor: Colors.black12, //Barrier Color when pop up show
-                minuteInterval: 1,
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                cancelText: 'Cancel',
-                confirmText: 'OK',
-                pressType: PressType.singlePress,
-                timeFormat: 'HH:mm:ss',
-                // textStyle: const TextStyle(
-                //   color: Colors.white,
-                // ),
-                // Customize your time widget
-                // timeWidgetBuilder: (dateTime) {},
-                onChange: (dateTime) {
-                  // Implement your logic with select dateTime
-                  setState(() {
-                    choiceNum_2 =
-                        dateTime.toString().split(' ').last.substring(0, 8);
-                    changeSeconds = stringToInt(choiceNum_2);
-                  });
-                },
-              ),
             ],
           ),
         ),
-        MyInputField(
-          hint: '$_selectedRemind번 실행',
-          widget: DropdownButton(
-            icon: Transform.translate(
-              offset: const Offset(-5, 0),
-              child: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Colors.grey,
-              ),
-            ),
-            iconSize: 32,
-            elevation: 4,
-            style: subTitleStyle,
-            underline: Container(
-              height: 0,
-            ),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedRemind = int.parse(newValue!);
-              });
-            },
-            items: remindList.map<DropdownMenuItem<String>>(
-              (int value) {
-                return DropdownMenuItem<String>(
-                  value: value.toString(),
-                  child: Text(
-                    value.toString(),
-                  ),
-                );
+        Column(
+          children: [
+            ElevatedButton(
+              child: const Text('Set the Time'),
+              onPressed: () {
+                _showDialog();
               },
-            ).toList(),
-          ),
+            ),
+          ],
         ),
         Center(
           child: Column(
@@ -239,51 +207,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       : Icons.play_circle_outline,
                 ),
               ),
-              // IconButton(
-              //   iconSize: 120,
-              //   color: Theme.of(context).cardColor,
-              //   onPressed: onResetPressed,
-              //   icon: const Icon(
-              //     Icons.refresh_outlined,
-              //   ),
-              // )
             ],
           ),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(40),
-                  ),
-                  color: Get.isDarkMode ? Colors.grey[600] : Colors.grey[300],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Pomodoros',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Theme.of(context).textTheme.displayLarge!.color,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '$totalPomodoros',
-                      style: TextStyle(
-                        fontSize: 58,
-                        color: Theme.of(context).textTheme.displayLarge!.color,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
         ),
       ],
     );
@@ -296,13 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
       leading: GestureDetector(
         onTap: () {
           ThemeService().SwitchTheme();
-          // notifyHelper.displayNotification(
-          //   title: 'Theme Changed',
-          //   body: Get.isDarkMode
-          //       ? 'Activated light Theme'
-          //       : 'Activated Dark Theme',
-          // );
-          // notifyHelper.scheduledNotification();
         },
         child: Icon(
           Get.isDarkMode ? Icons.light_mode_rounded : Icons.nightlight_round,
@@ -320,6 +238,179 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 20,
         )
       ],
+    );
+  }
+
+  _showDialog() {
+    showDialog(
+      context: context,
+      //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0)),
+              //Dialog Main Title
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  const Text("Set the Time"),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _currentValue = 0;
+                        _currentValue_2 = 0;
+                        _selectedRemind = 1;
+                      });
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Min',
+                              style: Theme.of(context).textTheme.titleLarge),
+                          const SizedBox(height: 16),
+                          NumberPicker(
+                            value: _currentValue,
+                            minValue: 0,
+                            maxValue: 60,
+                            itemHeight: 40,
+                            itemWidth: 80,
+                            onChanged: (value) {
+                              setState(() {
+                                _currentValue = value;
+                                minChange = _currentValue * 60;
+                              });
+                            },
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentValue - 10;
+                                    _currentValue = newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                              Text('$_currentValue'),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentValue + 10;
+                                    _currentValue = newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Sec',
+                              style: Theme.of(context).textTheme.titleLarge),
+                          const SizedBox(height: 16),
+                          NumberPicker(
+                            value: _currentValue_2,
+                            minValue: 0,
+                            maxValue: 60,
+                            itemHeight: 40,
+                            itemWidth: 80,
+                            onChanged: (value) {
+                              setState(() {
+                                _currentValue_2 = value;
+                                secChange = _currentValue_2;
+                              });
+                            },
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentValue_2 - 10;
+                                    _currentValue_2 = newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                              Text('$_currentValue_2'),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentValue_2 + 10;
+                                    _currentValue_2 = newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  DropdownButton(
+                    value: _selectedRemind,
+                    items: remindList
+                        .map((e) => DropdownMenuItem(
+                              value: e, // 선택 시 onChanged 를 통해 반환할 value
+                              child: Text(e.toString()),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      // items 의 DropdownMenuItem 의 value 반환
+                      setState(() {
+                        _selectedRemind = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                Container(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); //창 닫기
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                ),
+                Container(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); //창 닫기
+                      setState(() {
+                        changeSeconds = minChange + secChange;
+                      });
+                    },
+                    child: const Text("Set"),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
