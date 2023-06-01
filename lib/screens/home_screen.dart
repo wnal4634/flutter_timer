@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:pomo_app/services/theme_services.dart';
 import 'dart:async';
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int totalSeconds = 0;
+  int totalRestSeconds = 0;
   int changeSeconds = 0;
   int restChangeSeconds = 0;
   int minChange = 0;
@@ -22,8 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int restSecChange = 0;
   bool isRunning = false;
   late Timer timer; // late는 나중에 초기화
-  String choiceNum = '00:00';
-  String choiceNum_2 = '00:00';
   int _selectedRemind = 1;
   List<int> remindList = [
     1,
@@ -37,16 +37,25 @@ class _HomeScreenState extends State<HomeScreen> {
     9,
     10,
   ];
-  int _currentValue = 0;
-  int _currentValue_2 = 0;
+  int _currentMinValue = 0;
+  int _currentSecValue = 0;
+  int _currentRestMinValue = 0;
+  int _currentRestSecValue = 0;
 
   void onTick(Timer timer) {
     if (totalSeconds == 0) {
-      setState(() {
-        isRunning = false;
-        totalSeconds = 0;
-      });
-      timer.cancel();
+      if (totalRestSeconds == 0) {
+        setState(() {
+          isRunning = false;
+          totalSeconds = 0;
+        });
+        timer.cancel();
+      } else {
+        setState(() {
+          totalRestSeconds -= 1;
+          restChangeSeconds = totalRestSeconds;
+        });
+      }
     } else {
       setState(() {
         totalSeconds -= 1; // 남은 시간 1초씩 줄이기
@@ -57,8 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onStartPressed() {
-    // totalSeconds = stringToInt(choiceNum);
     totalSeconds = changeSeconds;
+    totalRestSeconds = restChangeSeconds;
     timer = Timer.periodic(
       const Duration(seconds: 1), // 1초에 한 번씩 onTick 실행
       onTick, //onTick() <-처럼 괄호넣지 않기. 당장 실행할게 아니기 떄문.
@@ -68,6 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void onRestStart() {}
+
   void onPausePressed() {
     timer.cancel();
     setState(() {
@@ -75,33 +86,17 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // String format(int seconds) {
-  //   // var duration = Duration(seconds: seconds);
-  //   // return duration.toString().split(".").first.padLeft(8, '0');
-  //
-  //   var duration = Duration(seconds: seconds);
-  //   var short = duration.toString().split(".").first.split(':');
-  //   if (short[0] != 0) {
-  //     int hour = int.parse(short[0]) * 60;
-  //     int min = int.parse(short[1]);
-  //     short[1] = (hour + min).toString();
-  //     if (short[1].length == 1) {
-  //       short[1] = short[1].padLeft(2, '0');
-  //     }
-  //   }
-  //   return '${short[1]}:${short.last}';
-  // }
+  void stateChangeSeconds() {
+    setState(() {
+      changeSeconds = minChange + secChange;
+      restChangeSeconds = restMinChange + restSecChange;
+    });
+  }
 
   String format(int seconds) {
     var duration = Duration(seconds: seconds);
     return duration.toString().split(".").first.substring(2, 7);
   }
-
-  // int stringToInt(String time) {
-  //   int total = (int.parse(time.split(':').first) * 3600) +
-  //       (int.parse(time.split(':')[1]) * 60);
-  //   return total;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -115,83 +110,21 @@ class _HomeScreenState extends State<HomeScreen> {
   _showBody() {
     return Column(
       children: [
-        Container(
-          alignment: Alignment.bottomCenter,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-          ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              // crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  format(changeSeconds),
-                  style: TextStyle(
-                    color: Get.isDarkMode ? Colors.white : darkHeaderClr,
-                    fontSize: 70,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                // TimePickerSpinnerPopUp(
-                //   mode: CupertinoDatePickerMode.time,
-                //   initTime: DateTime.parse('0000-00-00T00+00:00'),
-                //   barrierColor: Colors.black12, //Barrier Color when pop up show
-                //   minuteInterval: 1,
-                //   padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                //   cancelText: 'Cancel',
-                //   confirmText: 'OK',
-                //   pressType: PressType.singlePress,
-                //   timeFormat: 'HH:mm:ss',
-                //   // textStyle: const TextStyle(
-                //   //   color: Colors.white,
-                //   // ),
-                //   // Customize your time widget
-                //   // timeWidgetBuilder: (dateTime) {},
-                //   onChange: (dateTime) {
-                //     // Implement your logic with select dateTime
-                //     setState(() {
-                //       choiceNum =
-                //           dateTime.toString().split(' ').last.substring(0, 8);
-                //       // changeSeconds = stringToInt(choiceNum);
-                //     });
-                //   },
-                // ),
-              ],
-            ),
+        Text(
+          format(changeSeconds),
+          style: TextStyle(
+            color: Get.isDarkMode ? Colors.white : darkHeaderClr,
+            fontSize: 70,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        Container(
-          alignment: Alignment.bottomCenter,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
+        Text(
+          format(restChangeSeconds),
+          style: TextStyle(
+            color: Colors.grey[500],
+            fontSize: 50,
+            fontWeight: FontWeight.w600,
           ),
-          child: Row(
-            // mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                format(restChangeSeconds),
-                style: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 50,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Column(
-          children: [
-            ElevatedButton(
-              child: const Text('Set the Time'),
-              onPressed: () {
-                _showDialog();
-              },
-            ),
-          ],
         ),
         Center(
           child: Column(
@@ -208,6 +141,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+        Container(
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              _showDialog();
+            },
+            label: const Text('Set the Time'),
+            icon: const Icon(Icons.edit),
           ),
         ),
       ],
@@ -257,12 +199,17 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  const Text("Set the Time"),
+                  Text(
+                    "Set the Time",
+                    style: headingStyle,
+                  ),
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        _currentValue = 0;
-                        _currentValue_2 = 0;
+                        _currentMinValue = 0;
+                        _currentSecValue = 0;
+                        _currentRestMinValue = 0;
+                        _currentRestSecValue = 0;
                         _selectedRemind = 1;
                       });
                     },
@@ -273,6 +220,13 @@ class _HomeScreenState extends State<HomeScreen> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Text(
+                    'Work',
+                    style: subHeadingStyle,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -280,19 +234,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('Min',
-                              style: Theme.of(context).textTheme.titleLarge),
-                          const SizedBox(height: 16),
+                          Text(
+                            'Work Min',
+                            style: GoogleFonts.lato(
+                              textStyle: titleStyle,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
                           NumberPicker(
-                            value: _currentValue,
+                            value: _currentMinValue,
                             minValue: 0,
                             maxValue: 60,
-                            itemHeight: 40,
+                            itemHeight: 35,
                             itemWidth: 80,
                             onChanged: (value) {
                               setState(() {
-                                _currentValue = value;
-                                minChange = _currentValue * 60;
+                                _currentMinValue = value;
+                                minChange = _currentMinValue * 60;
                               });
                             },
                           ),
@@ -302,18 +262,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                 icon: const Icon(Icons.remove),
                                 onPressed: () {
                                   setState(() {
-                                    final newValue = _currentValue - 10;
-                                    _currentValue = newValue.clamp(0, 60);
+                                    final newValue = _currentMinValue - 10;
+                                    _currentMinValue = newValue.clamp(0, 60);
                                   });
                                 },
                               ),
-                              Text('$_currentValue'),
+                              Text('$_currentMinValue'),
                               IconButton(
                                 icon: const Icon(Icons.add),
                                 onPressed: () {
                                   setState(() {
-                                    final newValue = _currentValue + 10;
-                                    _currentValue = newValue.clamp(0, 60);
+                                    final newValue = _currentMinValue + 10;
+                                    _currentMinValue = newValue.clamp(0, 60);
                                   });
                                 },
                               ),
@@ -325,19 +285,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('Sec',
-                              style: Theme.of(context).textTheme.titleLarge),
-                          const SizedBox(height: 16),
+                          Text(
+                            'Work Sec',
+                            style: titleStyle,
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
                           NumberPicker(
-                            value: _currentValue_2,
+                            value: _currentSecValue,
                             minValue: 0,
                             maxValue: 60,
-                            itemHeight: 40,
+                            itemHeight: 35,
                             itemWidth: 80,
                             onChanged: (value) {
                               setState(() {
-                                _currentValue_2 = value;
-                                secChange = _currentValue_2;
+                                _currentSecValue = value;
+                                secChange = _currentSecValue;
                               });
                             },
                           ),
@@ -348,18 +312,136 @@ class _HomeScreenState extends State<HomeScreen> {
                                 icon: const Icon(Icons.remove),
                                 onPressed: () {
                                   setState(() {
-                                    final newValue = _currentValue_2 - 10;
-                                    _currentValue_2 = newValue.clamp(0, 60);
+                                    final newValue = _currentSecValue - 10;
+                                    _currentSecValue = newValue.clamp(0, 60);
                                   });
                                 },
                               ),
-                              Text('$_currentValue_2'),
+                              Text('$_currentSecValue'),
                               IconButton(
                                 icon: const Icon(Icons.add),
                                 onPressed: () {
                                   setState(() {
-                                    final newValue = _currentValue_2 + 10;
-                                    _currentValue_2 = newValue.clamp(0, 60);
+                                    final newValue = _currentSecValue + 10;
+                                    _currentSecValue = newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 26,
+                  ),
+                  Text(
+                    'Rest',
+                    style: subHeadingStyle,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Rest Min',
+                            style: titleStyle,
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          NumberPicker(
+                            value: _currentRestMinValue,
+                            minValue: 0,
+                            maxValue: 60,
+                            itemHeight: 35,
+                            itemWidth: 80,
+                            onChanged: (value) {
+                              setState(() {
+                                _currentRestMinValue = value;
+                                restMinChange = _currentRestMinValue * 60;
+                              });
+                            },
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentRestMinValue - 10;
+                                    _currentRestMinValue =
+                                        newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                              Text('$_currentRestMinValue'),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentRestMinValue + 10;
+                                    _currentRestMinValue =
+                                        newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Rest Sec',
+                            style: titleStyle,
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          NumberPicker(
+                            value: _currentRestSecValue,
+                            minValue: 0,
+                            maxValue: 60,
+                            itemHeight: 35,
+                            itemWidth: 80,
+                            onChanged: (value) {
+                              setState(() {
+                                _currentRestSecValue = value;
+                                restSecChange = _currentRestSecValue;
+                              });
+                            },
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentRestSecValue - 10;
+                                    _currentRestSecValue =
+                                        newValue.clamp(0, 60);
+                                  });
+                                },
+                              ),
+                              Text('$_currentRestSecValue'),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  setState(() {
+                                    final newValue = _currentRestSecValue + 10;
+                                    _currentRestSecValue =
+                                        newValue.clamp(0, 60);
                                   });
                                 },
                               ),
@@ -371,6 +453,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   DropdownButton(
                     value: _selectedRemind,
+                    icon: const RotatedBox(
+                      quarterTurns: 3,
+                      child: Icon(Icons.arrow_back_ios_new_rounded),
+                    ),
+                    iconSize: 12,
                     items: remindList
                         .map((e) => DropdownMenuItem(
                               value: e, // 선택 시 onChanged 를 통해 반환할 value
@@ -386,7 +473,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              actions: <Widget>[
+              actions: [
                 Container(
                   child: TextButton(
                     onPressed: () {
@@ -398,10 +485,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   child: ElevatedButton(
                     onPressed: () {
+                      stateChangeSeconds();
                       Navigator.of(context).pop(); //창 닫기
-                      setState(() {
-                        changeSeconds = minChange + secChange;
-                      });
                     },
                     child: const Text("Set"),
                   ),
