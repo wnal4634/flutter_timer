@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:pomo_app/services/noti_services.dart';
 import 'package:pomo_app/services/theme_services.dart';
 import 'dart:async';
 import 'package:pomo_app/screens/theme.dart';
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  var notifyHelper;
   int totalSeconds = 0;
   int totalRestSeconds = 0;
   int changeSeconds = 0;
@@ -48,6 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           isRunning = false;
           totalSeconds = 0;
+          // notifyHelper.displayNotification(
+          //   title: 'Timer Finish',
+          //   body: "Timer's time is up",
+          // );
         });
         timer.cancel();
       } else {
@@ -59,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       setState(() {
         totalSeconds -= 1; // 남은 시간 1초씩 줄이기
-        print(totalSeconds);
         changeSeconds = totalSeconds;
       });
     }
@@ -68,16 +73,31 @@ class _HomeScreenState extends State<HomeScreen> {
   void onStartPressed() {
     totalSeconds = changeSeconds;
     totalRestSeconds = restChangeSeconds;
-    timer = Timer.periodic(
-      const Duration(seconds: 1), // 1초에 한 번씩 onTick 실행
-      onTick, //onTick() <-처럼 괄호넣지 않기. 당장 실행할게 아니기 떄문.
-    );
-    setState(() {
-      isRunning = true;
-    });
+    _validateDate();
   }
 
-  void onRestStart() {}
+  _validateDate() {
+    if (totalSeconds == 0) {
+      Get.snackbar(
+        'Required',
+        'Work time cannot be zero !',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: pinkClr,
+        colorText: Colors.white,
+        icon: const Icon(
+          Icons.warning_amber_rounded,
+        ),
+      );
+    } else {
+      timer = Timer.periodic(
+        const Duration(seconds: 1), // 1초에 한 번씩 onTick 실행
+        onTick, //onTick() <-처럼 괄호넣지 않기. 당장 실행할게 아니기 떄문.
+      );
+      setState(() {
+        isRunning = true;
+      });
+    }
+  }
 
   void onPausePressed() {
     timer.cancel();
@@ -90,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       changeSeconds = minChange + secChange;
       restChangeSeconds = restMinChange + restSecChange;
+      _selectedRemind;
     });
   }
 
@@ -99,31 +120,68 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    notifyHelper = NotifyHelper();
+    notifyHelper.initializeNotification();
+    notifyHelper.requestIOSPermissions();
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
       backgroundColor: context.theme.colorScheme.background,
       body: _showBody(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _showDialog();
+        },
+        label: Text(
+          'Set the Time',
+          style: GoogleFonts.lato(
+            textStyle: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        icon: const Icon(
+          Icons.edit,
+          color: Colors.white,
+        ),
+        backgroundColor: Colors.indigo[400],
+      ),
     );
   }
 
   _showBody() {
     return Column(
       children: [
-        Text(
-          format(changeSeconds),
-          style: TextStyle(
-            color: Get.isDarkMode ? Colors.white : darkHeaderClr,
-            fontSize: 70,
-            fontWeight: FontWeight.w600,
+        Container(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).size.height * 0.2,
           ),
-        ),
-        Text(
-          format(restChangeSeconds),
-          style: TextStyle(
-            color: Colors.grey[500],
-            fontSize: 50,
-            fontWeight: FontWeight.w600,
+          child: Column(
+            children: [
+              Text(
+                format(changeSeconds),
+                style: TextStyle(
+                  color: Get.isDarkMode ? Colors.white : darkHeaderClr,
+                  fontSize: 70,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                format(restChangeSeconds),
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 50,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
         Center(
@@ -141,15 +199,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
-          ),
-        ),
-        Container(
-          child: FloatingActionButton.extended(
-            onPressed: () {
-              _showDialog();
-            },
-            label: const Text('Set the Time'),
-            icon: const Icon(Icons.edit),
           ),
         ),
       ],
@@ -170,16 +219,6 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Get.isDarkMode ? Colors.white : Colors.black,
         ),
       ),
-      actions: [
-        Icon(
-          Icons.person,
-          size: 20,
-          color: Get.isDarkMode ? Colors.white : Colors.black,
-        ),
-        const SizedBox(
-          width: 20,
-        )
-      ],
     );
   }
 
@@ -479,7 +518,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       Navigator.of(context).pop(); //창 닫기
                     },
-                    child: const Text("Cancel"),
+                    child: Text(
+                      "Cancel",
+                      style: GoogleFonts.lato(
+                        textStyle: TextStyle(
+                          color: Colors.indigo[400],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Container(
@@ -488,7 +535,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       stateChangeSeconds();
                       Navigator.of(context).pop(); //창 닫기
                     },
-                    child: const Text("Set"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo[400],
+                    ),
+                    child: Text(
+                      "Set",
+                      style: GoogleFonts.lato(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
