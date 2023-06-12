@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:pomo_app/services/noti_services.dart';
 import 'package:pomo_app/services/theme_services.dart';
 import 'dart:async';
 import 'package:pomo_app/screens/theme.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final player = AudioPlayer();
   var notifyHelper;
   int totalSeconds = 0;
   int totalRestSeconds = 0;
@@ -44,8 +45,13 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentRestMinValue = 0;
   int _currentRestSecValue = 0;
 
-  void onTick(Timer timer) {
+  void onTick(Timer timer) async {
     if (totalSeconds == 0) {
+      AudioPlayer().play(AssetSource('assets/sounds/bell.mp3'));
+      // notifyHelper.displayNotification(
+      //   title: 'Timer Finish',
+      //   body: "Timer's time is up",
+      // );
       if (totalRestSeconds == 0) {
         setState(() {
           isRunning = false;
@@ -122,9 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    notifyHelper = NotifyHelper();
-    notifyHelper.initializeNotification();
-    notifyHelper.requestIOSPermissions();
+    // notifyHelper = NotifyHelper();
+    // notifyHelper.initializeNotification();
+    // notifyHelper.requestIOSPermissions();
     setState(() {});
   }
 
@@ -199,6 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+        const Center(
+          child: CircleAvatar(
+            radius: 14,
+            backgroundImage: AssetImage('assets/rec_icon.png'),
           ),
         ),
       ],
