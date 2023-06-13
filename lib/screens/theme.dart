@@ -38,6 +38,21 @@ TextStyle get subHeadingStyle {
   );
 }
 
+TextStyle get lato {
+  return GoogleFonts.lato(
+    textStyle: const TextStyle(),
+  );
+}
+
+TextStyle get latoBold {
+  return GoogleFonts.lato(
+    textStyle: const TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+    ),
+  );
+}
+
 TextStyle get headingStyle {
   return GoogleFonts.lato(
     textStyle: TextStyle(
