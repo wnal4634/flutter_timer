@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         totalSeconds -= 1; // 남은 시간 1초씩 줄이기
         changeSeconds = totalSeconds;
-        print(totalSeconds);
       });
     }
   }
@@ -111,63 +110,55 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: _appBar(),
       backgroundColor: context.theme.colorScheme.background,
       body: _showBody(),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showDialog();
         },
-        label: Text(
-          'Set the Time',
-          style: GoogleFonts.lato(
-            textStyle: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        icon: const Icon(
+        backgroundColor: yellowClr,
+        child: const Icon(
           Icons.edit,
           color: Colors.white,
         ),
-        backgroundColor: Colors.indigo[400],
       ),
     );
   }
 
   _showBody() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Column(
+          children: [
+            Text(
+              format(changeSeconds),
+              style: TextStyle(
+                color: Get.isDarkMode ? Colors.white : darkHeaderClr,
+                fontSize: 70,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
         Container(
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.2,
+            bottom: MediaQuery.of(context).size.height * 0.08,
           ),
-          child: Column(
-            children: [
-              Text(
-                format(changeSeconds),
-                style: TextStyle(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  iconSize: 120,
                   color: Get.isDarkMode ? Colors.white : darkHeaderClr,
-                  fontSize: 70,
-                  fontWeight: FontWeight.w600,
+                  onPressed: isRunning ? onPausePressed : onStartPressed,
+                  icon: Icon(
+                    isRunning
+                        ? Icons.pause_circle_outline
+                        : Icons.play_circle_outline,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                iconSize: 120,
-                color: Get.isDarkMode ? Colors.white : darkHeaderClr,
-                onPressed: isRunning ? onPausePressed : onStartPressed,
-                icon: Icon(
-                  isRunning
-                      ? Icons.pause_circle_outline
-                      : Icons.play_circle_outline,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -261,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             textStyle: lato,
                             selectedTextStyle: GoogleFonts.lato(
                               textStyle: const TextStyle(
-                                color: pinkClr,
+                                color: yellowClr,
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -334,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             textStyle: lato,
                             selectedTextStyle: GoogleFonts.lato(
                               textStyle: const TextStyle(
-                                color: pinkClr,
+                                color: yellowClr,
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -521,37 +512,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               actions: [
-                Container(
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); //창 닫기
-                    },
-                    child: Text(
-                      "Cancel",
-                      style: GoogleFonts.lato(
-                        textStyle: TextStyle(
-                          color: Colors.indigo[400],
-                          fontWeight: FontWeight.w600,
-                        ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); //창 닫기
+                  },
+                  child: Text(
+                    "Cancel",
+                    style: GoogleFonts.lato(
+                      textStyle: const TextStyle(
+                        color: yellowClr,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
-                Container(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      stateChangeSeconds();
-                      Navigator.of(context).pop(); //창 닫기
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo[400],
-                    ),
-                    child: Text(
-                      "Set",
-                      style: GoogleFonts.lato(
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                ElevatedButton(
+                  onPressed: () {
+                    stateChangeSeconds();
+                    Navigator.of(context).pop(); //창 닫기
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: yellowClr,
+                    elevation: 4,
+                  ),
+                  child: Text(
+                    "Set",
+                    style: GoogleFonts.lato(
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
