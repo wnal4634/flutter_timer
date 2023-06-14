@@ -26,11 +26,13 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentSecValue = 0;
   int saveSeconds = 0;
 
-  void onTick(Timer timer) {
+  void onTick(Timer timer) async {
     if (totalSeconds == 0) {
-      player.setSpeed(1.5);
-      player.setVolume(2.5);
-      player.setAsset('assets/bell_sound.mp3');
+      // player.setSpeed(1.5);
+      // player.setVolume(2.5);
+      // player.setAsset('assets/bell_sound.mp3'); //앱
+      await player.setUrl(
+          'https://github.com/wnal4634/flutter_timer/assets/90739311/51085b86-bd48-414f-aaad-79688a2c4b2b'); //웹
       player.play();
       stateChangeSeconds();
       totalSeconds = changeSeconds;
