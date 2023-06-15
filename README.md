@@ -23,7 +23,7 @@ Demo: https://interval-timer-flutter.netlify.app
 
 
 0초로 세팅이 되어있으면 스낵메세지가 뜨며 실행되지 않습니다.
-<img src="" width="150"/>
+
 <img src="https://github.com/wnal4634/flutter_timer/assets/90739311/0aae2d0e-66f3-486a-96e1-acbdfb1ff0b1" width="150"/>
 
 
