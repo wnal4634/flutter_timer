@@ -32,6 +32,6 @@ Demo: https://interval-timer-flutter.netlify.app
 
 <b>[웹으로 배포한 앱의 실행화면]</b>
 
-(용량 문제로 한 번 재생 후 멈춥니다. 클릭하면 다시 보는게 가능하니 참고 부탁드립니다.)
+(용량 문제로 한 번 재생 후 멈춥니다. 이미지를 클릭하면 다시 보는게 가능하니 참고 부탁드립니다.)
 
 <img src="https://github.com/wnal4634/flutter_timer/assets/90739311/3dc2dec3-0fd2-4f59-8527-5b0acdcac94c" width="200"/>
