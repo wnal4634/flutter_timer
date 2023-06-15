@@ -7,15 +7,9 @@ Demo: https://interval-timer-flutter.netlify.app
 
 좌측 상단의 아이콘을 통해 기본모드와 다크모드를 설정할 수 있습니다. <br/>
 
-<b>[기본모드]</b>
+<b>[기본모드 & 다크모드]</b>
 
-<img src="https://github.com/wnal4634/flutter_timer/assets/90739311/283cfec6-a4a0-4c55-94c9-201843fbba10" width="150"/><img src="https://github.com/wnal4634/flutter_timer/assets/90739311/4e9406e3-b016-4ba7-9213-7eb60c5b29e2" width="150"/> <br/><br/>
-
-
-<b>[다크모드]</b>
-
- <br/><br/><br/>
-
+<img src="https://github.com/wnal4634/flutter_timer/assets/90739311/283cfec6-a4a0-4c55-94c9-201843fbba10" width="150"/> <img src="https://github.com/wnal4634/flutter_timer/assets/90739311/4e9406e3-b016-4ba7-9213-7eb60c5b29e2" width="150"/> <br/><br/><br/>
 
 
 
