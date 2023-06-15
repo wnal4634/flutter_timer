@@ -2,7 +2,10 @@
 
 Demo: https://interval-timer-flutter.netlify.app
 
-플러터로 제작한 인터벌 타이머 앱입니다. <br/>
+플러터로 제작한 인터벌 타이머 앱입니다. <br/><br/>
+
+
+좌측 상단의 아이콘을 통해 기본모드와 다크모드를 설정할 수 있습니다. <br/>
 
 <b>[기본모드]</b>
 
@@ -30,4 +33,9 @@ Demo: https://interval-timer-flutter.netlify.app
 
 <b>[실행화면]</b>
 
-<img src="https://github.com/wnal4634/flutter_timer/assets/90739311/21998f15-5c79-4f70-975f-09319c785288" width="150"/> 
+<img src="https://github.com/wnal4634/flutter_timer/assets/90739311/21998f15-5c79-4f70-975f-09319c785288" width="150"/> <br/><br/>
+
+
+<b>[웹으로 배포한 앱의 실행화면]</b>
+
+<img src="https://github.com/wnal4634/flutter_timer/assets/90739311/3dc2dec3-0fd2-4f59-8527-5b0acdcac94c" width="150"/>
