@@ -11,6 +11,7 @@ const Color darkGreyClr = Color(0xFF121212);
 Color darkHeaderClr = const Color(0xFF424242);
 
 class Themes {
+  //테마설정
   static final light = ThemeData(
     colorScheme: const ColorScheme.light(
       primary: primaryClr,

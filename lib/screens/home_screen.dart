@@ -28,11 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void onTick(Timer timer) async {
     if (totalSeconds == 0) {
+      //타이머가 0초 됐을 때 사운드 재생, 설정한 시간 다시 설정
       // player.setSpeed(1.5);
       // player.setVolume(2.5);
-      // player.setAsset('assets/bell_sound.mp3'); //앱
+      // player.setAsset('assets/bell_sound.mp3'); //앱용 사운드이나 아래 코드 사용 가능
       await player.setUrl(
-          'https://github.com/wnal4634/flutter_timer/assets/90739311/51085b86-bd48-414f-aaad-79688a2c4b2b'); //웹
+          'https://github.com/wnal4634/flutter_timer/assets/90739311/51085b86-bd48-414f-aaad-79688a2c4b2b'); //웹용 사운드
       player.play();
       stateChangeSeconds();
       totalSeconds = changeSeconds;
@@ -44,22 +45,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void repeat() {
-    timer = Timer.periodic(
-      const Duration(seconds: 1), // 1초에 한 번씩 onTick 실행
-      onTick, //onTick() <-처럼 괄호넣지 않기. 당장 실행할게 아니기 떄문.
-    );
-    setState(() {
-      isRunning = true;
-    });
-  }
-
   void onStartPressed() {
     totalSeconds = changeSeconds;
     _validateDate();
   }
 
   _validateDate() {
+    //설정한 시간이 0초면 스낵메세지, 아니면 타이머 실행
     if (totalSeconds == 0) {
       Get.snackbar(
         'Required',
@@ -83,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onPausePressed() {
+    //타이머 일시정지
     timer.cancel();
     setState(() {
       isRunning = false;
@@ -90,12 +83,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void stateChangeSeconds() {
+    //설정한 시간 바로 적용되게
     setState(() {
       changeSeconds = minChange + secChange;
     });
   }
 
   String format(int seconds) {
+    //시간 포맷
     var duration = Duration(seconds: seconds);
     return duration.toString().split(".").first.substring(2, 7);
   }
@@ -134,7 +129,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               format(changeSeconds),
               style: TextStyle(
-                color: Get.isDarkMode ? Colors.white : darkHeaderClr,
+                color: Get.isDarkMode
+                    ? Colors.white
+                    : darkHeaderClr, //다크모드냐에 따라 글씨 색상 변경
                 fontSize: 70,
                 fontWeight: FontWeight.w600,
               ),
@@ -152,7 +149,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   iconSize: 120,
                   color: Get.isDarkMode ? Colors.white : darkHeaderClr,
-                  onPressed: isRunning ? onPausePressed : onStartPressed,
+                  onPressed: isRunning
+                      ? onPausePressed
+                      : onStartPressed, //타이머가 실행 중이면 정지가 가능하게, 정지 상태면 실행이 가능하게
                   icon: Icon(
                     isRunning
                         ? Icons.pause_circle_outline
@@ -172,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 0,
       backgroundColor: context.theme.colorScheme.background,
       leading: GestureDetector(
+        //다크모드
         onTap: () {
           ThemeService().SwitchTheme();
         },
@@ -193,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
+              //플로팅 버튼 누르면 나오는 다이얼로그
               titlePadding: const EdgeInsets.only(
                 top: 15,
                 left: 30,
@@ -261,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             onChanged: (value) {
                               setState(() {
+                                //분을 초로 변환해서 저장
                                 _currentMinValue = value;
                                 minChange = _currentMinValue * 60;
                               });
@@ -280,6 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 onPressed: () {
                                   setState(() {
+                                    //10씩 빠르게 뺼 수 있음
                                     final newValue = _currentMinValue - 10;
                                     _currentMinValue = newValue.clamp(0, 60);
                                   });
@@ -298,6 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 onPressed: () {
                                   setState(() {
+                                    //10씩 빠르게 더할 수 있음
                                     final newValue = _currentMinValue + 10;
                                     _currentMinValue = newValue.clamp(0, 60);
                                   });
@@ -334,6 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             onChanged: (value) {
                               setState(() {
+                                //설정한 초 저장
                                 _currentSecValue = value;
                                 secChange = _currentSecValue;
                               });
@@ -354,6 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 onPressed: () {
                                   setState(() {
+                                    //10씩 빠르게 뺼 수 있음
                                     final newValue = _currentSecValue - 10;
                                     _currentSecValue = newValue.clamp(0, 60);
                                   });
@@ -372,6 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 onPressed: () {
                                   setState(() {
+                                    //10씩 빠르게 더할 수 있음
                                     final newValue = _currentSecValue + 10;
                                     _currentSecValue = newValue.clamp(0, 60);
                                   });
@@ -383,140 +390,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  //   children: [
-                  //     Column(
-                  //       mainAxisSize: MainAxisSize.min,
-                  //       crossAxisAlignment: CrossAxisAlignment.start,
-                  //       children: <Widget>[
-                  //         Text(
-                  //           'Rest Min',
-                  //           style: titleStyle,
-                  //         ),
-                  //         const SizedBox(
-                  //           height: 16,
-                  //         ),
-                  //         NumberPicker(
-                  //           value: _currentRestMinValue,
-                  //           minValue: 0,
-                  //           maxValue: 60,
-                  //           itemHeight: 35,
-                  //           itemWidth: 80,
-                  //           onChanged: (value) {
-                  //             setState(() {
-                  //               _currentRestMinValue = value;
-                  //               restMinChange = _currentRestMinValue * 60;
-                  //             });
-                  //           },
-                  //         ),
-                  //         Row(
-                  //           children: [
-                  //             IconButton(
-                  //               icon: const Icon(Icons.remove),
-                  //               onPressed: () {
-                  //                 setState(() {
-                  //                   final newValue = _currentRestMinValue - 10;
-                  //                   _currentRestMinValue =
-                  //                       newValue.clamp(0, 60);
-                  //                 });
-                  //               },
-                  //             ),
-                  //             Text('$_currentRestMinValue'),
-                  //             IconButton(
-                  //               icon: const Icon(Icons.add),
-                  //               onPressed: () {
-                  //                 setState(() {
-                  //                   final newValue = _currentRestMinValue + 10;
-                  //                   _currentRestMinValue =
-                  //                       newValue.clamp(0, 60);
-                  //                 });
-                  //               },
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ],
-                  //     ),
-                  //     Column(
-                  //       mainAxisSize: MainAxisSize.min,
-                  //       crossAxisAlignment: CrossAxisAlignment.start,
-                  //       children: <Widget>[
-                  //         Text(
-                  //           'Rest Sec',
-                  //           style: titleStyle,
-                  //         ),
-                  //         const SizedBox(
-                  //           height: 16,
-                  //         ),
-                  //         NumberPicker(
-                  //           value: _currentRestSecValue,
-                  //           minValue: 0,
-                  //           maxValue: 60,
-                  //           itemHeight: 35,
-                  //           itemWidth: 80,
-                  //           onChanged: (value) {
-                  //             setState(() {
-                  //               _currentRestSecValue = value;
-                  //               restSecChange = _currentRestSecValue;
-                  //             });
-                  //           },
-                  //         ),
-                  //         Row(
-                  //           mainAxisAlignment: MainAxisAlignment.center,
-                  //           children: [
-                  //             IconButton(
-                  //               icon: const Icon(Icons.remove),
-                  //               onPressed: () {
-                  //                 setState(() {
-                  //                   final newValue = _currentRestSecValue - 10;
-                  //                   _currentRestSecValue =
-                  //                       newValue.clamp(0, 60);
-                  //                 });
-                  //               },
-                  //             ),
-                  //             Text('$_currentRestSecValue'),
-                  //             IconButton(
-                  //               icon: const Icon(Icons.add),
-                  //               onPressed: () {
-                  //                 setState(() {
-                  //                   final newValue = _currentRestSecValue + 10;
-                  //                   _currentRestSecValue =
-                  //                       newValue.clamp(0, 60);
-                  //                 });
-                  //               },
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ],
-                  // ),
-                  // DropdownButton(
-                  //   value: _selectedRemind,
-                  //   icon: const RotatedBox(
-                  //     quarterTurns: 3,
-                  //     child: Icon(Icons.arrow_back_ios_new_rounded),
-                  //   ),
-                  //   iconSize: 12,
-                  //   items: remindList
-                  //       .map((e) => DropdownMenuItem(
-                  //             value: e, // 선택 시 onChanged 를 통해 반환할 value
-                  //             child: Text(e.toString()),
-                  //           ))
-                  //       .toList(),
-                  //   onChanged: (value) {
-                  //     // items 의 DropdownMenuItem 의 value 반환
-                  //     setState(() {
-                  //       _selectedRemind = value!;
-                  //     });
-                  //   },
-                  // ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); //창 닫기
+                    Navigator.of(context).pop(); //다이얼로그 창 닫기
                   },
                   child: Text(
                     "Cancel",
@@ -530,8 +409,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    stateChangeSeconds();
-                    Navigator.of(context).pop(); //창 닫기
+                    stateChangeSeconds(); //창 닫으면 설정한 시간 적용되게
+                    Navigator.of(context).pop(); //다이얼로그 창 닫기
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: yellowClr,

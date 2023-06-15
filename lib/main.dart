@@ -8,8 +8,8 @@ import 'package:flutter/services.dart';
 
 void main() async {
   await GetStorage.init();
-  // WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    //안드로이드 상단바 투명
     statusBarColor: Colors.transparent, // transparent status bar
   ));
   runApp(const MyApp());
